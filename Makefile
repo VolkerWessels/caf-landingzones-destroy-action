@@ -120,7 +120,9 @@ purge.custom-role-definitions: ## Purge custom role definitions using azure CLI
 	/bin/bash -c \
 	"for i in \`az role definition list -o tsv --query \"[?contains(roleName, '$(ENVIRONMENT)')].roleName\"\`; do echo \"purging custom role definition: \$$i\" && \$$(az role definition delete --name \$$i || true); done"
 
+purge: purge._start purge.diagnostic-settings purge.log-profiles purge.ad-users purge.ad-groups purge.ad-apps purge.keyvaults purge.resource-groups purge.role-assignments purge.custom-role-definitions ## Purge everything from all CAF landingzones using azure CLI
+	@echo -e "${GREEN}Purging complete${NC}"
+
 destroy: _LEVEL=$(LEVEL)
 destroy: _SOLUTION=$(SOLUTION)
-destroy: _destroy purge._start purge.diagnostic-settings purge.log-profiles purge.ad-users purge.ad-groups purge.ad-apps purge.keyvaults purge.resource-groups purge.role-assignments purge.custom-role-definitions ## Destroy (Purge) everything from all CAF landingzones using azure CLI
-	@echo -e "${GREEN}Purging complete${NC}"
+destroy: _destroy purge ## Destroy ( and Purge) everything from all CAF landingzones using azure CLI
