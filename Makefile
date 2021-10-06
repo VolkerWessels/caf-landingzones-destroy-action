@@ -52,10 +52,10 @@ info: ## Information about ENVIRONMENT variables and how to use them.
 	@echo "Please use '<env> <env> make [<arg1=a> <argN=...>] <target>' where <env> is one of"
 	@awk  'BEGIN { FS = "\\s?(\\?=|:=).*###"} /^[a-zA-Z\._-]+.*?###.* / {printf "\033[33m%-28s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-destroy: _ADD_ON = "caf_solution/"
-destroy: _TFSTATE = $(shell basename $(_SOLUTION))
-destroy: _VAR_FOLDERS= $(shell find $(TFVARS_PATH)/level$(_LEVEL)/$(_SOLUTION) -type d -print0 | xargs -0 -I '{}' sh -c "printf -- '-var-folder %s \ \n' '{}';" )
-destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SOLUTION=launchpad_name LEVEL=0
+_destroy: _ADD_ON = "caf_solution/"
+_destroy: _TFSTATE = $(shell basename $(_SOLUTION))
+_destroy: _VAR_FOLDERS= $(shell find $(TFVARS_PATH)/level$(_LEVEL)/$(_SOLUTION) -type d -print0 | xargs -0 -I '{}' sh -c "printf -- '-var-folder %s \ \n' '{}';" )
+_destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SOLUTION=launchpad_name LEVEL=0
 	@echo -e "${LIGHTGRAY}$$(cd $(_BASE_DIR) && pwd)${NC}"
 	@echo -e "${GREEN}Terraform destroy for '$(_SOLUTION) level$(_LEVEL)'${NC}"
 	_LEVEL="level$(_LEVEL)"
@@ -70,7 +70,7 @@ destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SOL
 			-tfstate $(_TFSTATE).tfstate \
 			-parallelism $(PARALLELISM) \
 			-env $(ENVIRONMENT) \
-			$$_VARS"
+			$$_VARS" || true
 
 purge._start:
 	@echo -e "${GREEN}Start Purging${NC}"
@@ -120,5 +120,7 @@ purge.custom-role-definitions: ## Purge custom role definitions using azure CLI
 	/bin/bash -c \
 	"for i in \`az role definition list -o tsv --query \"[?contains(roleName, '$(ENVIRONMENT)')].roleName\"\`; do echo \"purging custom role definition: \$$i\" && \$$(az role definition delete --name \$$i || true); done"
 
-purge: purge._start purge.diagnostic-settings purge.log-profiles purge.ad-users purge.ad-groups purge.ad-apps purge.keyvaults purge.resource-groups purge.role-assignments purge.custom-role-definitions ## Destroy (Purge) everything from all CAF landingzones using azure CLI
+destroy: _LEVEL=$(LEVEL)
+destroy: _SOLUTION=$(SOLUTION)
+destroy: _destroy purge._start purge.diagnostic-settings purge.log-profiles purge.ad-users purge.ad-groups purge.ad-apps purge.keyvaults purge.resource-groups purge.role-assignments purge.custom-role-definitions ## Destroy (Purge) everything from all CAF landingzones using azure CLI
 	@echo -e "${GREEN}Purging complete${NC}"
