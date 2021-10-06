@@ -21,9 +21,3 @@ runs:
     - name: Remove levels with terraform
       run: make destroy SOLUTION=${{ inputs.landingzone }} LEVEL=${{ inputs.level }}
       shell: bash
-    - uses: VolkerWessels/conditional-composite-action@v1 # Workaround until possibility to use 'if:' option for action steps of composite actions
-      with:
-        if: |
-          ${{ failure() }}
-        step: |
-          make purge
