@@ -1,0 +1,24 @@
+name: 'CAF landing zone '
+description: 'VolkerWessels purge landing zones'
+inputs:
+  config_dir:
+    description: 'The configuration directory from which to run the commands'
+    required: true
+  landingzone:
+    description: 'The segment (launchpad, solution or add-on) of a cloud environment to destroy'
+    required: true
+  level:
+    description: 'The level to destroy'
+    required: true
+    default: true
+runs:
+  steps:
+    - run: |
+        echo "GITHUB_ACTION_PATH=${GITHUB_ACTION_PATH}" >> $GITHUB_ENV;
+        echo "TFVARS_PATH=${{ inputs.config_dir }}" >> $GITHUB_ENV;
+        echo "BASE_PATH=$(dirname ${{ inputs.config_dir }})" >> $GITHUB_ENV;
+    - name: Remove levels with terraform
+      run: make destroy SOLUTION=${{ inputs.landingzone }} LEVEL=${{ inputs.level }}
+    - name: Complete purge with azure cli
+      if: ${{ always() }}
+      run: make purge
