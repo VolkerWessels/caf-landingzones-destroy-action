@@ -23,6 +23,7 @@ runs:
       shell: bash
     - uses: VolkerWessels/conditional-composite-action@v1 # Workaround until possibility to use 'if:' option for action steps of composite actions
       with:
-        if: ${{ failure() }}
+        if: |
+          ${{ failure() }}
         step: |
           make purge

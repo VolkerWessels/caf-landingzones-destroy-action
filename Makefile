@@ -63,13 +63,14 @@ destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SOL
 	_VARS=""
 	if [ "$(_LEVEL)" == "0" ]; then _ADD_ON="caf_launchpad" _LEVEL="level0 -launchpad" && _VARS="'-var random_length=$(RANDOM_LENGTH)' '-var prefix=$(PREFIX)'"; fi
 	if [ -d "$(LANDINGZONES_DIR)/caf_solution/$(_SOLUTION)" ]; then _ADD_ON="caf_solution/$(_SOLUTION)"; fi
-	/tf/rover/rover.sh -lz ${LANDINGZONES_DIR}/${ADD_ON} -a destroy \
-		$(_VAR_FOLDERS) \
-		-level $$_LEVEL \
-		-tfstate $(_TFSTATE).tfstate \
-		-parallelism $(PARALLELISM) \
-		-env $(ENVIRONMENT) \
-		$$_VARS"
+	/bin/bash -c \
+		"/tf/rover/rover.sh -lz ${LANDINGZONES_DIR}/${ADD_ON} -a destroy \
+			$(_VAR_FOLDERS) \
+			-level $$_LEVEL \
+			-tfstate $(_TFSTATE).tfstate \
+			-parallelism $(PARALLELISM) \
+			-env $(ENVIRONMENT) \
+			$$_VARS"
 
 purge._start:
 	@echo -e "${GREEN}Start Purging${NC}"
