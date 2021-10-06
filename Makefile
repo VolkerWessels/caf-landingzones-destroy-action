@@ -39,8 +39,6 @@ _BASE_DIR = $(shell dirname $(TFVARS_PATH))
 
 LANDINGZONES_DIR?="$(_BASE_DIR)/landingzones" ### Landingzone directory checkout dir. Defaults to 'landingzones/'
 ENVIRONMENT := $(shell echo $(ENVIRONMENT) | tr '[:upper:]' '[:lower:]') ### Environment name to deploy to.
-_VAR_FOLDERS= $(shell find $(TFVARS_PATH)/level$(_LEVEL)/$(_SOLUTION) -type d -print0 | xargs -0 -I '{}' sh -c "printf -- '-var-folder %s \ \n' '{}';" )
-_TFSTATE = $(shell basename $(_SOLUTION))
 
 _PREFIX:=g$(GITHUB_RUN_ID)
 PREFIX?=$(_PREFIX)
@@ -54,6 +52,9 @@ info: ## Information about ENVIRONMENT variables and how to use them.
 	@echo "Please use '<env> <env> make [<arg1=a> <argN=...>] <target>' where <env> is one of"
 	@awk  'BEGIN { FS = "\\s?(\\?=|:=).*###"} /^[a-zA-Z\._-]+.*?###.* / {printf "\033[33m%-28s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+destroy: _ADD_ON = "caf_solution/"
+destroy: _TFSTATE = $(shell basename $(_SOLUTION))
+destroy: _VAR_FOLDERS= $(shell find $(TFVARS_PATH)/level$(_LEVEL)/$(_SOLUTION) -type d -print0 | xargs -0 -I '{}' sh -c "printf -- '-var-folder %s \ \n' '{}';" )
 destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SOLUTION=launchpad_name LEVEL=0
 	@echo -e "${LIGHTGRAY}$$(cd $(_BASE_DIR) && pwd)${NC}"
 	@echo -e "${GREEN}Terraform destroy for '$(_SOLUTION) level$(_LEVEL)'${NC}"
@@ -61,7 +62,7 @@ destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SOL
 	_SOLUTION=$(SOLUTION)
 	_VARS=""
 	if [ "$(_LEVEL)" == "0" ]; then _ADD_ON="caf_launchpad" _LEVEL="level0 -launchpad" && _VARS="'-var random_length=$(RANDOM_LENGTH)' '-var prefix=$(PREFIX)'"; fi
-	if [ "$(_LEVEL)" == "1" ]; then _ADD_ON="ssc_foundations_sharedservices" _LEVEL="level1" && _VARS="'-var random_length=$(RANDOM_LENGTH)' '-var prefix=$(PREFIX)'"; fi
+	if [ -d "$(LANDINGZONES_DIR)/caf_solution/$(_SOLUTION)" ]; then _ADD_ON="caf_solution/$(_SOLUTION)"; fi
 	/tf/rover/rover.sh -lz ${LANDINGZONES_DIR}/${ADD_ON} -a destroy \
 		$(_VAR_FOLDERS) \
 		-level $$_LEVEL \
