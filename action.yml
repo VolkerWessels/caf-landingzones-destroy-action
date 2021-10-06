@@ -17,6 +17,7 @@ runs:
         echo "GITHUB_ACTION_PATH=${GITHUB_ACTION_PATH}" >> $GITHUB_ENV;
         echo "TFVARS_PATH=${{ inputs.config_dir }}" >> $GITHUB_ENV;
         echo "BASE_PATH=$(dirname ${{ inputs.config_dir }})" >> $GITHUB_ENV;
+      shell: bash
     - name: Remove levels with terraform
       run: make destroy SOLUTION=${{ inputs.landingzone }} LEVEL=${{ inputs.level }}
       shell: bash
