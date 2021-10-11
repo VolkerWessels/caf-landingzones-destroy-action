@@ -12,6 +12,7 @@ inputs:
     required: true
     default: true
 runs:
+  using: "composite"
   steps:
     - run: |
         echo "GITHUB_ACTION_PATH=${GITHUB_ACTION_PATH}" >> $GITHUB_ENV;
