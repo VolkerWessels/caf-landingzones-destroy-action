@@ -4,11 +4,18 @@ inputs:
   config_dir:
     description: 'The configuration directory from which to run the commands'
     required: true
+  environment:
+    description: 'The environment variable used in Azure tags'
+    required: true
   landingzone:
     description: 'The segment (launchpad, solution or add-on) of a cloud environment to destroy'
     required: true
   level:
     description: 'The level to destroy'
+    required: true
+    default: true
+  tags:
+    description: 'The tags of the resources to destroy'
     required: true
     default: true
 runs:
