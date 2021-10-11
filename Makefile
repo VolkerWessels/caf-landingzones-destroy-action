@@ -125,4 +125,4 @@ purge: purge._start purge.diagnostic-settings purge.log-profiles purge.ad-users 
 
 destroy: _LEVEL=$(LEVEL)
 destroy: _SOLUTION=$(SOLUTION)
-destroy: _destroy purge ## Destroy ( and Purge) everything from all CAF landingzones using azure CLI
+destroy: _destroy purge ## Destroy (and Purge) everything from all CAF landingzones using azure CLI
