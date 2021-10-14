@@ -118,10 +118,10 @@ _destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SO
 			-auto-approve" || TRUE
 
 purge._skip:
-	echo -e "${GREEN}Skip purging${NC}";
+	echo -e "${GREEN}Skip purging '$(PURGE)'${NC}";
 
 purge._start:
-	echo -e "${GREEN}Start Purging${NC}";
+	echo -e "${GREEN}Start Purging '$(PURGE)'${NC}";
 
 purge.diagnostic-settings: ## Purge diagnostic settings using azure CLI (only for level 0)
 	if [ "$(_LEVEL)" == "0" ]; then
@@ -160,7 +160,7 @@ purge.keyvaults: ## Purge keyvaults using azure CLI
 purge.resource-groups: ## Purge resource groups using azure CLI
 	@echo -e "${PURPLE}Running target '$@'${NC}";
 	/bin/bash -c \
-    	"for i in \`az group list -o tsv --query \"[?tags.environment=='$(ENVIRONMENT) && tags.level=='$(_LEVEL)' && tags.landingzone=='$(_SOLUTION)' ].name\"\`; do echo \"purging resource group: \$$i\" && \$$(az group delete -n \$$i -y --no-wait || true); done"
+    	"for i in \`az group list -o tsv --query \"[?tags.environment=='$(ENVIRONMENT)' && tags.level=='$(_LEVEL)' && tags.landingzone=='$(_SOLUTION)' ].name\"\`; do echo \"purging resource group: \$$i\" && \$$(az group delete -n \$$i -y --no-wait || true); done"
 purge.role-assignments: ## Purge custom role assignments using azure CLI
 	if [ "$(_LEVEL)" == "0" ]; then
 		echo -e "${PURPLE}Running target '$@'${NC}";

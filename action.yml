@@ -3,7 +3,7 @@ description: 'VolkerWessels purge landing zones'
 inputs:
   purge:
     description: '"USE WITH CAUTION" If terraform destroy fails a destroy can be forced using azure CLI'
-    default: "false"
+    default: "0"
     required: false
   config_dir:
     description: 'A directory in `github.workspace` containing config (*.tfvar) files.'
@@ -53,7 +53,5 @@ runs:
       run: make destroy SOLUTION=${{ inputs.landingzone }} LEVEL=${{ inputs.level }}
       working-directory: ${{ env.GITHUB_ACTION_PATH }}
       env:
-        PURGE: ${{ inputs.purge }}
-        PREFIX: ${{ inputs.prefix }}
-        ENVIRONMENT: ${{ inputs.environment }}
+        PURGE: "${{ contains( ${{ inputs.purge }}, [1, true, 'true'] ) }}"
       shell: bash
