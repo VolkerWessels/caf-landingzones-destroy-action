@@ -53,5 +53,5 @@ runs:
       run: make destroy SOLUTION=${{ inputs.landingzone }} LEVEL=${{ inputs.level }}
       working-directory: ${{ env.GITHUB_ACTION_PATH }}
       env:
-        PURGE: "${{ contains( ${{ inputs.purge }}, [1, true, 'true'] ) }}"
+        PURGE: "${{ contains( inputs.purge , [1, true, 'true'] ) }}"
       shell: bash
