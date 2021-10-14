@@ -115,7 +115,7 @@ _destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SO
 			-parallelism $(PARALLELISM) \
 			-env $(ENVIRONMENT) \
 			-refresh=false \
-			-auto-approve" || TRUE
+			-auto-approve" || true
 
 purge._skip:
 	echo -e "${GREEN}Skip purging '$(PURGE)'${NC}";
