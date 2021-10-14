@@ -20,9 +20,6 @@ inputs:
   level:
     description: 'Deploy level'
     required: true
-  tags:
-    description: 'Json string of tags to import'
-    required: false
 runs:
   using: "composite"
   steps:
