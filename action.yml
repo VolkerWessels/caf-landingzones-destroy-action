@@ -1,23 +1,28 @@
 name: 'CAF landing zone '
 description: 'VolkerWessels purge landing zones'
 inputs:
+  purge:
+    description: '"USE WITH CAUTION" If terraform destroy fails a destroy can be forced using azure CLI'
+    default: "false"
+    required: false
   config_dir:
-    description: 'The configuration directory from which to run the commands'
+    description: 'A directory in `github.workspace` containing config (*.tfvar) files.'
     required: true
   environment:
     description: 'The environment variable used in Azure tags'
     required: true
+  prefix:
+    description: 'The prefix variable used in Azure naming'
+    required: true
   landingzone:
-    description: 'The segment (launchpad, solution or add-on) of a cloud environment to destroy'
+    description: 'the segment (launchpad, solution or add-on) of a cloud environment to deploy'
     required: true
   level:
-    description: 'The level to destroy'
+    description: 'Deploy level'
     required: true
-    default: true
   tags:
-    description: 'The tags of the resources to destroy'
-    required: true
-    default: true
+    description: 'Json string of tags to import'
+    required: false
 runs:
   using: "composite"
   steps:
@@ -26,6 +31,32 @@ runs:
         echo "TFVARS_PATH=${{ inputs.config_dir }}" >> $GITHUB_ENV;
         echo "BASE_PATH=$(dirname ${{ inputs.config_dir }})" >> $GITHUB_ENV;
       shell: bash
-    - name: Remove levels with terraform
+    - name: Terraform Cache
+      id: terraform-cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${TF_PLUGIN_CACHE_DIR}
+        key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
+        restore-keys: |
+          ${{ runner.os }}-terraform-
+    - name: Install landingzones
+      run: make landingzones
+      shell: bash
+      working-directory: ${{ env.GITHUB_ACTION_PATH }}
+      env:
+        TF_LZ_GIT: https://github.com/VolkerWessels/caf-terraform-landingzones.git
+        TF_LZ_BRANCH: 2108.0-modified
+    - name: Azure login with service principal
+      run: make login
+      working-directory: ${{ env.GITHUB_ACTION_PATH }}
+      shell: bash
+    - name: Run destroy
+      id: solution-destroy
       run: make destroy SOLUTION=${{ inputs.landingzone }} LEVEL=${{ inputs.level }}
+      working-directory: ${{ env.GITHUB_ACTION_PATH }}
+      env:
+        PURGE: ${{ inputs.purge }}
+        PREFIX: ${{ inputs.prefix }}
+        ENVIRONMENT: ${{ inputs.environment }}
       shell: bash
