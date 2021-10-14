@@ -53,7 +53,7 @@ runs:
       run: make destroy SOLUTION=${{ inputs.landingzone }} LEVEL=${{ inputs.level }}
       working-directory: ${{ env.GITHUB_ACTION_PATH }}
       env:
-        PURGE: "${{ inputs.purge }}"
+        PURGE: ${{ inputs.purge }}
         PREFIX: ${{ inputs.prefix }}
         ENVIRONMENT: ${{ inputs.environment }}
       shell: bash

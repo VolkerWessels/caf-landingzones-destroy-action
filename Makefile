@@ -113,9 +113,7 @@ _destroy: ## Run `terraform destroy` using rover. Usage example: make destroy SO
 			-tfstate $(_TFSTATE).tfstate \
 			-log-severity ERROR \
 			-parallelism $(PARALLELISM) \
-			-env $(ENVIRONMENT) \
-			-refresh=false \
-			-auto-approve" || true
+			-env $(ENVIRONMENT)" || true
 
 purge._skip:
 	echo -e "${GREEN}Skip purging '$(PURGE)'${NC}";
@@ -156,11 +154,11 @@ purge.ad-apps: ## Purge ad apps using azure CLI
 purge.keyvaults: ## Purge keyvaults using azure CLI
 	@echo -e "${PURPLE}Running target '$@'${NC}";
 	/bin/bash -c \
-		"for i in \`az keyvault list-deleted -o tsv --query \"[?tags.environment=='$(ENVIRONMENT)' && tags.level=='$(_LEVEL)' && tags.landingzone=='$(_SOLUTION)'].name\"\`; do az keyvault purge --name \$$i; done"
+		"for i in \`az keyvault list-deleted -o tsv --query \"[?tags.environment=='$(ENVIRONMENT)' && tags.level=='level$(_LEVEL)' && tags.landingzone=='$(_SOLUTION)'].name\"\`; do az keyvault purge --name \$$i; done"
 purge.resource-groups: ## Purge resource groups using azure CLI
 	@echo -e "${PURPLE}Running target '$@'${NC}";
 	/bin/bash -c \
-    	"for i in \`az group list -o tsv --query \"[?tags.environment=='$(ENVIRONMENT)' && tags.level=='$(_LEVEL)' && tags.landingzone=='$(_SOLUTION)' ].name\"\`; do echo \"purging resource group: \$$i\" && \$$(az group delete -n \$$i -y --no-wait || true); done"
+    	"for i in \`az group list -o tsv --query \"[?tags.environment=='$(ENVIRONMENT)' && tags.level=='level$(_LEVEL)' && tags.landingzone=='$(_SOLUTION)' ].name\"\`; do echo \"purging resource group: \$$i\" && \$$(az group delete -n \$$i -y --no-wait || true); done"
 purge.role-assignments: ## Purge custom role assignments using azure CLI
 	if [ "$(_LEVEL)" == "0" ]; then
 		echo -e "${PURPLE}Running target '$@'${NC}";
