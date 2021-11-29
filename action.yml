@@ -43,7 +43,7 @@ runs:
       working-directory: ${{ env.GITHUB_ACTION_PATH }}
       env:
         TF_LZ_GIT: https://github.com/VolkerWessels/caf-terraform-landingzones.git
-        TF_LZ_BRANCH: 2108.0-modified
+        TF_LZ_BRANCH: vmss-extensions-autoscale-combined
     - name: Azure login with service principal
       run: make login
       working-directory: ${{ env.GITHUB_ACTION_PATH }}
