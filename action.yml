@@ -5,6 +5,10 @@ inputs:
     description: '"USE WITH CAUTION" If terraform destroy fails a destroy can be forced using azure CLI'
     default: "false"
     required: false
+  branch:
+    description: 'The branch of the caf-terraform-landingzones repository'
+    default: 2108.0-modified
+    required: false
   config_dir:
     description: 'A directory in `github.workspace` containing config (*.tfvar) files.'
     required: true
@@ -43,7 +47,7 @@ runs:
       working-directory: ${{ env.GITHUB_ACTION_PATH }}
       env:
         TF_LZ_GIT: https://github.com/VolkerWessels/caf-terraform-landingzones.git
-        TF_LZ_BRANCH: vmss-extensions-autoscale-combined
+        TF_LZ_BRANCH: ${{ inputs.branch }}
     - name: Azure login with service principal
       run: make login
       working-directory: ${{ env.GITHUB_ACTION_PATH }}
